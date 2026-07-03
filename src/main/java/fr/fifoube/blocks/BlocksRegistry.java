@@ -28,14 +28,18 @@ public class BlocksRegistry{
 	public static final RegistryObject<Block> BLOCK_BUYER = register("block_buyer", () -> new BlockBuyer(metalProperties()), new Item.Properties());
 
 
-    public static final RegistryObject<Block> BLOCK_BILLS = registerWithCustomBlockItem("block_bills", () -> new BlockBills(woodProperties()));
+    public static final RegistryObject<Block> BLOCK_BILLS = registerWithCustomBlockItem("block_bills", () -> new BlockBills(billsProperties()));
 
     private static Block.Properties metalProperties() {
-        return Block.Properties.of().mapColor(MapColor.METAL).requiresCorrectToolForDrops().strength(-1.0F, 3600000.0F).sound(SoundType.METAL);
+        return Block.Properties.of().mapColor(MapColor.METAL).strength(5.0F, 6.0F).requiresCorrectToolForDrops().sound(SoundType.METAL);
     }
 
     private static Block.Properties woodProperties() {
-        return Block.Properties.of().mapColor(MapColor.WOOD).strength(-1.0F, 3600000.0F).sound(SoundType.WOOD);
+        return Block.Properties.of().mapColor(MapColor.WOOD).strength(2.0F, 3.0F).sound(SoundType.WOOD);
+    }
+
+    private static Block.Properties billsProperties() {
+        return Block.Properties.of().mapColor(MapColor.WOOD).strength(2.0F, 3.0F).sound(SoundType.WOOD).noOcclusion();
     }
 
     private static RegistryObject<Block> register(String name, Supplier<Block> block, Item.Properties properties)
