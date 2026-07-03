@@ -16,30 +16,38 @@ public class PacketCardChange {
 
 	private long amount;
 	private boolean deposit;
+	private String pin;
+	private boolean confirmed;
 
 	public PacketCardChange() {
 	}
 
-	public PacketCardChange(long amount, boolean deposit) {
+	public PacketCardChange(long amount, boolean deposit, String pin, boolean confirmed) {
 		this.amount = amount;
 		this.deposit = deposit;
+		this.pin = pin == null ? "" : pin;
+		this.confirmed = confirmed;
 	}
 
 	public static PacketCardChange decode(FriendlyByteBuf buf) {
 		long amount = buf.readLong();
 		boolean deposit = buf.readBoolean();
-		return new PacketCardChange(amount, deposit);
+		String pin = buf.readUtf(16);
+		boolean confirmed = buf.readBoolean();
+		return new PacketCardChange(amount, deposit, pin, confirmed);
 	}
 
 	public static void encode(PacketCardChange packet, FriendlyByteBuf buf) {
 		buf.writeLong(packet.amount);
 		buf.writeBoolean(packet.deposit);
+		buf.writeUtf(packet.pin == null ? "" : packet.pin, 16);
+		buf.writeBoolean(packet.confirmed);
 	}
 
 	public static void handle(PacketCardChange packet, Supplier<NetworkEvent.Context> ctx) {
 		ctx.get().enqueueWork(() -> {
 			Player player = ctx.get().getSender();
-			if (!(player instanceof ServerPlayer)) {
+			if (!(player instanceof ServerPlayer serverPlayer)) {
 				return;
 			}
 			if (!AtmService.isValidAmount(packet.amount)) {
@@ -52,9 +60,9 @@ public class PacketCardChange {
 			}
 			player.getCapability(CapabilityMoney.MONEY_CAPABILITY, null).ifPresent(data -> {
 				if (packet.deposit) {
-					AtmService.deposit(player, data, packet.amount);
+					AtmService.deposit(serverPlayer, data, packet.amount, packet.pin);
 				} else {
-					AtmService.withdraw(player, data, packet.amount);
+					AtmService.withdraw(serverPlayer, data, packet.amount, packet.pin, packet.confirmed);
 				}
 			});
 		});

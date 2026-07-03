@@ -7,6 +7,8 @@ import fr.fifoube.gui.container.MenuSeller;
 import fr.fifoube.gui.utilities.GuiUtilities;
 import fr.fifoube.gui.widget.RefillIconButton;
 import fr.fifoube.main.ModEconomyInc;
+import fr.fifoube.gui.utilities.GuiText;
+import fr.fifoube.main.economy.MoneyFormat;
 import fr.fifoube.packets.PacketSellerCreated;
 import fr.fifoube.packets.PacketsRegistery;
 import net.minecraft.client.Minecraft;
@@ -157,8 +159,8 @@ public class GuiSeller extends AbstractContainerScreen<MenuSeller> {
 		this.renderBackground(guiGraphics);
 		super.render(guiGraphics, mouseX, mouseY, partialTicks);
 		MutableComponent s = this.admin ? Component.translatable("title.unlimitedStack") : Component.translatable("title.limitedStack");
-		guiGraphics.drawString(this.font, Component.translatable("title.cost",  tile.getCost()), this.getGuiLeft() + 100, this.getGuiTop() + 33, Color.DARK_GRAY.getRGB());
-		guiGraphics.drawString(this.font, Component.translatable("title.mode", s), this.getGuiLeft() + 100, this.getGuiTop() + 44, Color.DARK_GRAY.getRGB());
+		GuiText.draw(this.font, guiGraphics, Component.translatable("title.cost", MoneyFormat.display(tile.getCost())), this.getGuiLeft() + 100, this.getGuiTop() + 33, Color.DARK_GRAY.getRGB());
+		GuiText.draw(this.font, guiGraphics, Component.translatable("title.mode", s), this.getGuiLeft() + 100, this.getGuiTop() + 44, Color.DARK_GRAY.getRGB());
 		this.renderTooltip(guiGraphics, mouseX, mouseY);
 	}
 	

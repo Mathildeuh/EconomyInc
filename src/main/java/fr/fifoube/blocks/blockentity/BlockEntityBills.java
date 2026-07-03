@@ -131,6 +131,10 @@ public class BlockEntityBills extends BlockEntity {
 		return stack;
 	}
 
+    public int getTotalValue() {
+        return this.numbBills * this.billRef;
+    }
+
 	@Override
 	public void setChanged() {
 		super.setChanged();

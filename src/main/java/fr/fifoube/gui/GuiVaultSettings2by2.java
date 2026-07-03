@@ -3,6 +3,7 @@
 package fr.fifoube.gui;
 
 import fr.fifoube.blocks.blockentity.BlockEntityVault2by2;
+import fr.fifoube.gui.utilities.GuiText;
 import fr.fifoube.main.ModEconomyInc;
 import fr.fifoube.packets.PacketVaultSettings;
 import fr.fifoube.packets.PacketsRegistery;
@@ -89,7 +90,7 @@ public class GuiVaultSettings2by2  extends Screen
 	    for (int i = 0; i < tile.getAllowedPlayers().size(); i++) {
 	    	
     		String playerName = tile.getAllowedPlayers().get(i).substring(0, tile.getAllowedPlayers().get(i).indexOf(","));
-    		guiGraphics.drawString(this.font, playerName, ((this.width - this.xSize) / 2) + 52 , ((this.height - this.ySize) / 2) + (20 * (i + 1)), 0x00);
+    		GuiText.draw(this.font, guiGraphics, playerName, ((this.width - this.xSize) / 2) + 52 , ((this.height - this.ySize) / 2) + (20 * (i + 1)), 0xFFFFFF);
 		}
 	    for (int j = 0; j < 5; j++) {
 			

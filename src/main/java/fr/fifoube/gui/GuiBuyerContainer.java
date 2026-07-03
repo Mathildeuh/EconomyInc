@@ -15,6 +15,7 @@ package fr.fifoube.gui;
 
 import fr.fifoube.blocks.blockentity.BlockEntityBuyer;
 import fr.fifoube.gui.container.MenuBuyer;
+import fr.fifoube.gui.utilities.GuiText;
 import fr.fifoube.main.ModEconomyInc;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -70,8 +71,8 @@ public class GuiBuyerContainer extends AbstractContainerScreen<MenuBuyer>
 
 	@Override
 	protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-		guiGraphics.drawString(this.font, this.tile.getDisplayName(), 8, 5, 4210752);
-		guiGraphics.drawString(this.font, this.inv.getDisplayName().getString(), 8, this.ySize - 94, 4210752);
+		GuiText.draw(this.font, guiGraphics, this.tile.getDisplayName(), 8, 5, 4210752);
+		GuiText.draw(this.font, guiGraphics, this.inv.getDisplayName().getString(), 8, this.ySize - 94, 4210752);
 	}
 
 	@Override

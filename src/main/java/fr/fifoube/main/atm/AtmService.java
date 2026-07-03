@@ -7,8 +7,13 @@ import fr.fifoube.items.ItemsRegistery;
 import fr.fifoube.main.ModEconomyInc;
 import fr.fifoube.main.capabilities.IMoney;
 import fr.fifoube.main.config.ConfigFile;
+import fr.fifoube.main.economy.PinUtil;
+import fr.fifoube.main.economy.TransactionHistoryService;
+import fr.fifoube.main.economy.TransactionType;
+import fr.fifoube.main.economy.MoneyFormat;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -31,6 +36,25 @@ public final class AtmService {
         return amount > 0 && amount <= MAX_TRANSACTION_AMOUNT;
     }
 
+    public static long calculateFee(long amount, double feePercent) {
+        if (feePercent <= 0) {
+            return 0;
+        }
+        return MoneyFormat.toWhole(amount * feePercent / 100.0);
+    }
+
+    public static double effectiveAtmWithdrawFeePercent() {
+        return ConfigFile.enableAtmWithdrawFee ? ConfigFile.atmWithdrawFeePercent : 0.0;
+    }
+
+    public static double effectiveGoldConvertFeePercent() {
+        return ConfigFile.enableGoldConvertFee ? ConfigFile.goldConvertFeePercent : 0.0;
+    }
+
+    public static boolean areAtmFeesEnabled() {
+        return ConfigFile.enableAtmWithdrawFee && ConfigFile.atmWithdrawFeePercent > 0;
+    }
+
     public static Optional<ItemStack> findOwnedCreditCard(Player player) {
         for (int i = 0; i < player.getInventory().getContainerSize(); i++) {
             ItemStack stack = player.getInventory().getItem(i);
@@ -41,6 +65,18 @@ public final class AtmService {
             }
         }
         return Optional.empty();
+    }
+
+    public static boolean verifyPin(Player player, String pin) {
+        Optional<ItemStack> card = findOwnedCreditCard(player);
+        if (card.isEmpty()) {
+            return false;
+        }
+        return PinUtil.verifyPin(card.get(), pin == null ? "" : pin, player.getStringUUID());
+    }
+
+    public static boolean requiresPin(Player player) {
+        return findOwnedCreditCard(player).map(PinUtil::isPinEnabled).orElse(false);
     }
 
     public static boolean canUseAtm(Player player) {
@@ -71,8 +107,12 @@ public final class AtmService {
         return false;
     }
 
-    public static boolean deposit(Player player, IMoney account, long amount) {
+    public static boolean deposit(ServerPlayer player, IMoney account, long amount, String pin) {
         if (!isValidAmount(amount) || !canUseAtm(player)) {
+            return false;
+        }
+        if (!verifyPin(player, pin)) {
+            player.sendSystemMessage(Component.translatable("title.invalidPin"));
             return false;
         }
         if (getInventoryBillValue(player) < amount) {
@@ -85,17 +125,28 @@ public final class AtmService {
         }
         double previous = account.getMoney();
         account.setMoney(previous + amount);
+        TransactionHistoryService.record(player, account, TransactionType.DEPOSIT, amount, null);
         ModEconomyInc.LOGGER_MONEY.info(player.getDisplayName().getString() + " deposited " + amount
-                + ". Balance was " + previous + ", balance is now " + account.getMoney()
-                + ". [UUID: " + player.getUUID() + "]");
+                + ". Balance was " + MoneyFormat.display(previous) + ", balance is now " + MoneyFormat.display(account.getMoney())
+                + ". [Player: " + player.getGameProfile().getName() + "]");
         return true;
     }
 
-    public static boolean withdraw(Player player, IMoney account, long amount) {
+    public static boolean withdraw(ServerPlayer player, IMoney account, long amount, String pin, boolean confirmed) {
         if (!isValidAmount(amount) || !canUseAtm(player)) {
             return false;
         }
-        if (account.getMoney() < amount) {
+        if (!verifyPin(player, pin)) {
+            player.sendSystemMessage(Component.translatable("title.invalidPin"));
+            return false;
+        }
+        if (amount >= ConfigFile.atmConfirmThreshold && !confirmed) {
+            player.sendSystemMessage(Component.translatable("title.withdrawConfirmRequired", amount));
+            return false;
+        }
+        long fee = calculateFee(amount, effectiveAtmWithdrawFeePercent());
+        long totalDebit = amount + fee;
+        if (account.getMoney() < totalDebit) {
             player.sendSystemMessage(Component.translatable("title.insufficientFunds"));
             return false;
         }
@@ -108,14 +159,19 @@ public final class AtmService {
             player.addItem(stack);
         }
         double previous = account.getMoney();
-        account.setMoney(previous - amount);
+        account.setMoney(previous - totalDebit);
+        TransactionHistoryService.record(player, account, TransactionType.WITHDRAW, amount, fee > 0 ? "fee:" + fee : null);
+        if (fee > 0) {
+            TransactionHistoryService.record(player, account, TransactionType.FEE, fee, "withdraw");
+        }
         ModEconomyInc.LOGGER_MONEY.info(player.getDisplayName().getString() + " withdrew " + amount
-                + ". Balance was " + previous + ", balance is now " + account.getMoney()
-                + ". [UUID: " + player.getUUID() + "]");
+                + (fee > 0 ? " (fee " + fee + ")" : "")
+                + ". Balance was " + MoneyFormat.display(previous) + ", balance is now " + MoneyFormat.display(account.getMoney())
+                + ". [Player: " + player.getGameProfile().getName() + "]");
         return true;
     }
 
-    private static long getInventoryBillValue(Player player) {
+    public static long getInventoryBillValue(Player player) {
         long total = 0;
         for (int i = 0; i < player.getInventory().getContainerSize(); i++) {
             ItemStack stack = player.getInventory().getItem(i);
@@ -125,6 +181,14 @@ public final class AtmService {
             }
         }
         return total;
+    }
+
+    public static long maxWithdrawableBalance(double balance) {
+        if (!ConfigFile.enableAtmWithdrawFee || ConfigFile.atmWithdrawFeePercent <= 0) {
+            return (long) Math.floor(balance);
+        }
+        double divisor = 1.0 + ConfigFile.atmWithdrawFeePercent / 100.0;
+        return (long) Math.floor(balance / divisor);
     }
 
     private static boolean consumeBills(Player player, long amount) {

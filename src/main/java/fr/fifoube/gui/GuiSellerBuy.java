@@ -6,6 +6,8 @@ import fr.fifoube.blocks.blockentity.BlockEntitySeller;
 import fr.fifoube.gui.container.MenuSellerBuy;
 import fr.fifoube.gui.utilities.GuiUtilities;
 import fr.fifoube.main.ModEconomyInc;
+import fr.fifoube.gui.utilities.GuiText;
+import fr.fifoube.main.economy.MoneyFormat;
 import fr.fifoube.packets.PacketSellerFundsTotal;
 import fr.fifoube.packets.PacketsRegistery;
 import net.minecraft.ChatFormatting;
@@ -119,13 +121,13 @@ public class GuiSellerBuy extends AbstractContainerScreen<MenuSellerBuy>
         guiGraphics.blit(BACKGROUND, this.guiLeft, this.guiTop, 0, 0, xSize, ySize);
 		this.drawImageInGui((this.width / 2) + 85, (this.height / 2) - 40);
         super.render(guiGraphics, mouseX, mouseY, partialTicks);
-        guiGraphics.drawString(this.font, Component.translatable("title.seller",  owner).withStyle(ChatFormatting.BOLD), (this.width / 2) - 120, (this.height / 2)- 55, Color.BLACK.getRGB());
-		guiGraphics.drawString(this.font, Component.translatable("title.item", itemName).withStyle(ChatFormatting.BOLD), (this.width / 2) - 120, (this.height / 2)- 45, Color.BLACK.getRGB());
-		guiGraphics.drawString(this.font, Component.translatable("title.cost", cost).withStyle(ChatFormatting.BOLD), (this.width / 2) - 120, (this.height / 2)- 35, Color.BLACK.getRGB());
-		guiGraphics.drawString(this.font, Component.translatable("title.amount", amount).withStyle(ChatFormatting.BOLD), (this.width / 2) - 120, (this.height / 2)- 25, Color.BLACK.getRGB());
+        GuiText.draw(this.font, guiGraphics, Component.translatable("title.seller",  owner).withStyle(ChatFormatting.BOLD), (this.width / 2) - 120, (this.height / 2)- 55, Color.BLACK.getRGB());
+		GuiText.draw(this.font, guiGraphics, Component.translatable("title.item", itemName).withStyle(ChatFormatting.BOLD), (this.width / 2) - 120, (this.height / 2)- 45, Color.BLACK.getRGB());
+		GuiText.draw(this.font, guiGraphics, Component.translatable("title.cost", MoneyFormat.display(cost)).withStyle(ChatFormatting.BOLD), (this.width / 2) - 120, (this.height / 2)- 35, Color.BLACK.getRGB());
+		GuiText.draw(this.font, guiGraphics, Component.translatable("title.amount", amount).withStyle(ChatFormatting.BOLD), (this.width / 2) - 120, (this.height / 2)- 25, Color.BLACK.getRGB());
 		if(sellerOwner.equals(worldPlayer))
 		{
-			guiGraphics.drawString(this.font, Component.translatable("title.fundsToRecover", fundsTotalRecovery).withStyle(ChatFormatting.BOLD), (this.width / 2) - 120, (this.height / 2)- 15, Color.BLACK.getRGB());
+			GuiText.draw(this.font, guiGraphics, Component.translatable("title.fundsToRecover", MoneyFormat.display(fundsTotalRecovery)).withStyle(ChatFormatting.BOLD), (this.width / 2) - 120, (this.height / 2)- 15, Color.BLACK.getRGB());
 		}
 
 	}

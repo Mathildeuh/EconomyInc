@@ -18,6 +18,11 @@ import fr.fifoube.gui.container.type.MenuTypeRegistery;
 import fr.fifoube.items.ItemsRegistery;
 import fr.fifoube.main.capabilities.IMoney;
 import fr.fifoube.main.commands.CommandBalance;
+import fr.fifoube.main.commands.CommandBaltop;
+import fr.fifoube.main.commands.CommandCardPin;
+import fr.fifoube.main.commands.CommandMoney;
+import fr.fifoube.main.commands.CommandMoneyLog;
+import fr.fifoube.main.commands.CommandPay;
 import fr.fifoube.main.commands.CommandsPlots;
 import fr.fifoube.main.commands.CommandsPlotsBuy;
 import fr.fifoube.main.config.ConfigHolder;
@@ -95,6 +100,11 @@ public class ModEconomyInc {
 		public void onCommandRegister(RegisterCommandsEvent event)
 		{
 			CommandBalance.register(event.getDispatcher());
+			CommandPay.register(event.getDispatcher());
+			CommandMoney.register(event.getDispatcher());
+			CommandBaltop.register(event.getDispatcher());
+			CommandMoneyLog.register(event.getDispatcher());
+			CommandCardPin.register(event.getDispatcher());
 			CommandsPlots.register(event.getDispatcher());
 			CommandsPlotsBuy.register(event.getDispatcher());
 		}

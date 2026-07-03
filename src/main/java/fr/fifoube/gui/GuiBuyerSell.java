@@ -16,6 +16,8 @@ package fr.fifoube.gui;
 import fr.fifoube.blocks.blockentity.BlockEntityBuyer;
 import fr.fifoube.gui.utilities.GuiUtilities;
 import fr.fifoube.main.ModEconomyInc;
+import fr.fifoube.gui.utilities.GuiText;
+import fr.fifoube.main.economy.MoneyFormat;
 import fr.fifoube.packets.PacketBuyerChange;
 import fr.fifoube.packets.PacketsRegistery;
 import net.minecraft.ChatFormatting;
@@ -111,9 +113,9 @@ public class GuiBuyerSell extends Screen
 		this.renderBackground(guiGraphics);
 		guiGraphics.blit(background, this.guiLeft, this.guiTop, 0, 0, xSize, ySize);
 		this.drawImageInGui((this.width / 2) + 85, (this.height / 2) - 40);
-		guiGraphics.drawString(this.font, Component.translatable("title.seller",  tile.getOwnerName()).withStyle(ChatFormatting.BOLD), (this.width / 2) - 120, (this.height / 2)- 55, Color.BLACK.getRGB());
-		guiGraphics.drawString(this.font, Component.translatable("title.item", tile.getItemStackToBuy().getDisplayName().getString()).withStyle(ChatFormatting.BOLD), (this.width / 2) - 120, (this.height / 2)- 45, Color.BLACK.getRGB());
-		guiGraphics.drawString(this.font, Component.translatable("title.cost", tile.getCost()).withStyle(ChatFormatting.BOLD), (this.width / 2) - 120, (this.height / 2)- 35, Color.BLACK.getRGB());
+		GuiText.draw(this.font, guiGraphics, Component.translatable("title.seller",  tile.getOwnerName()).withStyle(ChatFormatting.BOLD), (this.width / 2) - 120, (this.height / 2)- 55, Color.BLACK.getRGB());
+		GuiText.draw(this.font, guiGraphics, Component.translatable("title.item", tile.getItemStackToBuy().getDisplayName().getString()).withStyle(ChatFormatting.BOLD), (this.width / 2) - 120, (this.height / 2)- 45, Color.BLACK.getRGB());
+		GuiText.draw(this.font, guiGraphics, Component.translatable("title.cost", MoneyFormat.display(tile.getCost())).withStyle(ChatFormatting.BOLD), (this.width / 2) - 120, (this.height / 2)- 35, Color.BLACK.getRGB());
 		super.render(guiGraphics, mouseX, mouseY, partialTicks);
 	}
 }

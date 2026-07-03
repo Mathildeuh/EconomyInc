@@ -63,9 +63,13 @@ public class BlockBills extends Block implements EntityBlock {
 	    	BlockEntity tileentity = level.getBlockEntity(pos);
 	    	if(tileentity instanceof BlockEntityBills te)
 	    	{
+	    		ItemStack heldStack = player.getItemInHand(hand);
+	    		if (heldStack.isEmpty() && te.getNumbBills() > 0) {
+	    			player.displayClientMessage(net.minecraft.network.chat.Component.translatable("title.billsStorageValue", te.getTotalValue()), true);
+	    			return InteractionResult.SUCCESS;
+	    		}
 				if(te.getNumbBills() != 64)
 		    	{
-	    			ItemStack heldStack = player.getItemInHand(hand);
 	    			Item item = heldStack.getItem();
 		    		if(te.getNumbBills() == 0)
 		    		{

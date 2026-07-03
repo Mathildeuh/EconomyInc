@@ -16,6 +16,8 @@ package fr.fifoube.gui;
 import fr.fifoube.blocks.blockentity.BlockEntityBuyer;
 import fr.fifoube.gui.container.MenuBuyerCreation;
 import fr.fifoube.main.ModEconomyInc;
+import fr.fifoube.gui.utilities.GuiText;
+import fr.fifoube.main.economy.MoneyFormat;
 import fr.fifoube.packets.PacketBuyerCreation;
 import fr.fifoube.packets.PacketsRegistery;
 import net.minecraft.client.Minecraft;
@@ -124,9 +126,9 @@ public class GuiBuyerCreation extends AbstractContainerScreen<MenuBuyerCreation>
 
 		if(stackInSlot != ItemStack.EMPTY)
 		{
-			guiGraphics.drawString(this.font, stackInSlot.getDisplayName().getString(), 30, 29, Color.DARK_GRAY.getRGB());
+			GuiText.draw(this.font, guiGraphics, stackInSlot.getDisplayName().getString(), 30, 29, Color.DARK_GRAY.getRGB());
 		}
-		guiGraphics.drawString(this.font, Component.translatable("title.fundsCard", moneyInTile), 30, 44, Color.DARK_GRAY.getRGB());
+		GuiText.draw(this.font, guiGraphics, Component.translatable("title.fundsCard", MoneyFormat.display(moneyInTile)), 30, 44, Color.DARK_GRAY.getRGB());
 		super.renderLabels(guiGraphics, mouseX, mouseY);
 	}
 
