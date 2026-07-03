@@ -37,6 +37,8 @@
 
 "_comment" : "CREDIT CARD RELATED",
 
+"gui.creditcard":"ATM",
+
 "title.ownerCard":"Owner : %s",
 "title.fundsCard":"Funds : %s",
 "title.amountInput":"Amount",
@@ -51,6 +53,8 @@
 "title.pinEnabled":"PIN enabled",
 "title.billsStorageValue":"%s $ stored",
 "title.atmFeeInfo":"Withdrawal fee: %s%%",
+"title.atmFeePreview":"Withdraw %s $ → fee %s $ (total debited %s $)",
+"title.withdrawConfirmWithFee":"Withdraw %s $ (+ fee %s $, total %s $)?",
 "title.withdrawConfirm":"Withdraw %s $?",
 "title.withdrawConfirmRequired":"Confirm this withdrawal in the ATM (large amount).",
 "title.historyHeader":"History:",

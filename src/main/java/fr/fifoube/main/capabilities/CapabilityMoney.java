@@ -14,6 +14,7 @@
 package fr.fifoube.main.capabilities;
 
 import fr.fifoube.main.ModEconomyInc;
+import fr.fifoube.main.economy.EconomyConfigService;
 import fr.fifoube.main.economy.EconomyLeaderboardService;
 import fr.fifoube.main.economy.TransactionHistoryService;
 import fr.fifoube.packets.PacketMoneyData;
@@ -76,6 +77,7 @@ public class CapabilityMoney {
 				data.setMoney(data.getMoney());
 				EconomyLeaderboardService.update(player, data.getMoney());
 				TransactionHistoryService.syncToClient(player, TransactionHistoryService.copyHistory(data));
+				EconomyConfigService.syncToClient(player);
 			});
 	}
 	

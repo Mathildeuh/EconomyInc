@@ -10,7 +10,7 @@ import net.minecraftforge.network.simple.SimpleChannel;
 
 public class PacketsRegistery {
 
-	public static final String PROTOCOL_VERSION = String.valueOf(3);
+	public static final String PROTOCOL_VERSION = String.valueOf(4);
 	
 	public static final SimpleChannel CHANNEL = NetworkRegistry.ChannelBuilder.named(new ResourceLocation(ModEconomyInc.MOD_ID, "packets_ei")).networkProtocolVersion(() -> PROTOCOL_VERSION)
 			.clientAcceptedVersions(PROTOCOL_VERSION::equals).serverAcceptedVersions(PROTOCOL_VERSION::equals).simpleChannel();
@@ -29,6 +29,8 @@ public class PacketsRegistery {
 		CHANNEL.messageBuilder(PacketRefillSeller.class, 10).encoder(PacketRefillSeller::encode).decoder(PacketRefillSeller::decode).consumerMainThread(PacketRefillSeller::handle).add();
 		CHANNEL.messageBuilder(PacketTransactionHistory.class, 11).encoder(PacketTransactionHistory::encode).decoder(PacketTransactionHistory::decode).consumerMainThread(PacketTransactionHistory::handle).add();
 		CHANNEL.messageBuilder(PacketRequestTransactionHistory.class, 12).encoder(PacketRequestTransactionHistory::encode).decoder(PacketRequestTransactionHistory::decode).consumerMainThread(PacketRequestTransactionHistory::handle).add();
+		CHANNEL.messageBuilder(PacketEconomyConfigSync.class, 13).encoder(PacketEconomyConfigSync::encode).decoder(PacketEconomyConfigSync::decode).consumerMainThread(PacketEconomyConfigSync::handle).add();
+		CHANNEL.messageBuilder(PacketRequestEconomyConfig.class, 14).encoder(PacketRequestEconomyConfig::encode).decoder(PacketRequestEconomyConfig::decode).consumerMainThread(PacketRequestEconomyConfig::handle).add();
 
 	}
 

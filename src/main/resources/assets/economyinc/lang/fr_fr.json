@@ -33,6 +33,8 @@
 
 "entity.entityInformater":"Informateur",
 
+"gui.creditcard":"Distributeur automatique",
+
 "title.ownerCard":"Propriétaire : %s",
 "title.fundsCard":"Fonds : %s",
 "title.amountInput":"Montant",
@@ -47,6 +49,8 @@
 "title.pinEnabled":"PIN activé",
 "title.billsStorageValue":"%s $ stockés",
 "title.atmFeeInfo":"Commission retrait : %s%%",
+"title.atmFeePreview":"Retrait %s $ → taxe %s $ (total débité %s $)",
+"title.withdrawConfirmWithFee":"Retirer %s $ (+ taxe %s $, total %s $) ?",
 "title.withdrawConfirm":"Retirer %s $ ?",
 "title.withdrawConfirmRequired":"Confirmez ce retrait dans l'ATM (montant élevé).",
 "title.historyHeader":"Historique :",

@@ -7,12 +7,13 @@ import fr.fifoube.gui.utilities.GuiText;
 import fr.fifoube.items.ItemsRegistery;
 import fr.fifoube.main.atm.AtmService;
 import fr.fifoube.main.capabilities.CapabilityMoney;
-import fr.fifoube.main.config.ConfigFile;
+import fr.fifoube.main.economy.EconomyClientConfig;
 import fr.fifoube.main.economy.MoneyFormat;
 import fr.fifoube.main.economy.PinUtil;
 import fr.fifoube.main.economy.TransactionRecord;
 import fr.fifoube.packets.ClientEconomyData;
 import fr.fifoube.packets.PacketCardChange;
+import fr.fifoube.packets.PacketRequestEconomyConfig;
 import fr.fifoube.packets.PacketRequestTransactionHistory;
 import fr.fifoube.packets.PacketsRegistery;
 import net.minecraft.client.Minecraft;
@@ -71,6 +72,7 @@ public class GuiCreditCard extends Screen {
 			this.pinRequired = findOwnedCard(player).map(PinUtil::isPinEnabled).orElse(false);
 		}
 		PacketsRegistery.CHANNEL.sendToServer(new PacketRequestTransactionHistory());
+		PacketsRegistery.CHANNEL.sendToServer(new PacketRequestEconomyConfig());
 
 		this.panelLeft = (this.width - PANEL_WIDTH) / 2;
 		this.panelTop = (this.height - PANEL_HEIGHT) / 2;
@@ -88,10 +90,10 @@ public class GuiCreditCard extends Screen {
 		this.addRenderableWidget(this.amountField);
 
 		if (this.pinRequired) {
-			this.pinField = new MaskedPinEditBox(this.font, left + 136, row1, 56, 18, Component.translatable("title.pinInput"));
-			this.pinField.setMaxLength(4);
-			this.pinField.setFilter(text -> text.isEmpty() || text.matches("\\d+"));
-			this.pinField.setHint(Component.translatable("title.pinInput"));
+			MaskedPinEditBox pinBox = new MaskedPinEditBox(this.font, left + 136, row1, 56, 18, Component.translatable("title.pinInput"));
+			pinBox.setMaxLength(4);
+			pinBox.setHint(Component.translatable("title.pinInput"));
+			this.pinField = pinBox;
 			this.addRenderableWidget(this.pinField);
 		}
 
@@ -166,7 +168,8 @@ public class GuiCreditCard extends Screen {
 	}
 
 	private void quickWithdraw(double ratio) {
-		long max = AtmService.maxWithdrawableBalance(this.funds);
+		EconomyClientConfig config = ClientEconomyData.getConfig();
+		long max = config.maxWithdrawableBalance(this.funds);
 		long amount = ratio >= 1.0 ? max : Math.max(1, (long) Math.floor(max * ratio));
 		if (amount <= 0 || !AtmService.isValidAmount(amount)) {
 			showInvalidAmount();
@@ -182,7 +185,7 @@ public class GuiCreditCard extends Screen {
 			showInvalidAmount();
 			return;
 		}
-		if (!deposit && amount.getAsLong() >= ConfigFile.atmConfirmThreshold && !this.awaitingConfirm) {
+		if (!deposit && amount.getAsLong() >= ClientEconomyData.getConfig().atmConfirmThreshold() && !this.awaitingConfirm) {
 			this.pendingWithdrawAmount = amount.getAsLong();
 			this.awaitingConfirm = true;
 			updateConfirmVisibility();
@@ -285,14 +288,24 @@ public class GuiCreditCard extends Screen {
 		GuiText.draw(this.font, guiGraphics, Component.translatable("title.ownerCard", name), left, this.panelTop + 24, TEXT_COLOR);
 		GuiText.draw(this.font, guiGraphics, Component.translatable("title.fundsCard", MoneyFormat.display(this.funds)), left, this.panelTop + 36, TEXT_COLOR);
 
-		if (AtmService.areAtmFeesEnabled()) {
-			GuiText.draw(this.font, guiGraphics, Component.translatable("title.atmFeeInfo", (long) ConfigFile.atmWithdrawFeePercent),
-					left, this.panelTop + 48, MUTED_COLOR);
-		}
+		renderWithdrawFeeSection(guiGraphics, left);
 
 		if (this.awaitingConfirm) {
-			GuiText.drawCentered(this.font, guiGraphics, Component.translatable("title.withdrawConfirm", this.pendingWithdrawAmount),
-					this.panelLeft + PANEL_WIDTH / 2, this.panelTop + 92, ACCENT_COLOR);
+			EconomyClientConfig config = ClientEconomyData.getConfig();
+			if (config.areAtmFeesEnabled()) {
+				long fee = config.calculateFee(this.pendingWithdrawAmount);
+				long total = this.pendingWithdrawAmount + fee;
+				GuiText.drawCentered(this.font, guiGraphics,
+						Component.translatable("title.withdrawConfirmWithFee",
+								MoneyFormat.display(this.pendingWithdrawAmount),
+								MoneyFormat.display(fee),
+								MoneyFormat.display(total)),
+						this.panelLeft + PANEL_WIDTH / 2, this.panelTop + 88, ACCENT_COLOR);
+			} else {
+				GuiText.drawCentered(this.font, guiGraphics,
+						Component.translatable("title.withdrawConfirm", MoneyFormat.display(this.pendingWithdrawAmount)),
+						this.panelLeft + PANEL_WIDTH / 2, this.panelTop + 92, ACCENT_COLOR);
+			}
 		}
 
 		GuiText.draw(this.font, guiGraphics, Component.translatable("title.historyHeader"), left, this.panelTop + 162, MUTED_COLOR);
@@ -307,6 +320,27 @@ public class GuiCreditCard extends Screen {
 					MoneyFormat.display(record.amount()),
 					record.detail() == null || record.detail().isBlank() ? "-" : record.detail());
 			GuiText.draw(this.font, guiGraphics, line, left, this.panelTop + 174 + i * 10, MUTED_COLOR);
+		}
+	}
+
+	private void renderWithdrawFeeSection(GuiGraphics guiGraphics, int left) {
+		EconomyClientConfig config = ClientEconomyData.getConfig();
+		if (!config.areAtmFeesEnabled()) {
+			return;
+		}
+		long feePercent = (long) config.effectiveAtmWithdrawFeePercent();
+		OptionalLong amount = parseAmount(this.amountField.getValue());
+		if (amount.isPresent() && amount.getAsLong() > 0 && AtmService.isValidAmount(amount.getAsLong())) {
+			long withdrawAmount = amount.getAsLong();
+			long fee = config.calculateFee(withdrawAmount);
+			long total = withdrawAmount + fee;
+			GuiText.draw(this.font, guiGraphics, Component.translatable("title.atmFeePreview",
+					MoneyFormat.display(withdrawAmount),
+					MoneyFormat.display(fee),
+					MoneyFormat.display(total)), left, this.panelTop + 48, MUTED_COLOR);
+		} else {
+			GuiText.draw(this.font, guiGraphics, Component.translatable("title.atmFeeInfo", feePercent),
+					left, this.panelTop + 48, MUTED_COLOR);
 		}
 	}
 }
