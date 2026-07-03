@@ -69,7 +69,7 @@ public class CapabilityMoney {
 	@SubscribeEvent
 	public static void onPlayerLoggedIn(PlayerLoggedInEvent event)
 	{
-		if(!event.getEntity().level.isClientSide)
+		if(!event.getEntity().level().isClientSide)
 			event.getEntity().getCapability(MONEY_CAPABILITY).ifPresent(data -> { 
 				data.setMoney(data.getMoney());
 			});
@@ -78,7 +78,7 @@ public class CapabilityMoney {
 	@SubscribeEvent
 	public static void onPlayerRespawn(PlayerEvent.PlayerRespawnEvent event)
 	{
-		if(!event.getEntity().level.isClientSide && event.getEntity() instanceof ServerPlayer)
+		if(!event.getEntity().level().isClientSide && event.getEntity() instanceof ServerPlayer)
 		{
 			ServerPlayer player = (ServerPlayer)event.getEntity();
 			event.getEntity().getCapability(MONEY_CAPABILITY, null).ifPresent(data -> {
@@ -92,7 +92,7 @@ public class CapabilityMoney {
 	@SubscribeEvent
 	public static void onDimensionTravel(PlayerChangedDimensionEvent event)
 	{
-		if(!event.getEntity().level.isClientSide)
+		if(!event.getEntity().level().isClientSide)
 			event.getEntity().getCapability(CapabilityMoney.MONEY_CAPABILITY).ifPresent(data -> { 
 				data.setMoney(data.getMoney());
 			});

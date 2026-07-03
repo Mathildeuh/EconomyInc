@@ -54,7 +54,7 @@ public class PacketSellerFundsTotal {
 			ctx.get().enqueueWork(() -> {
 				
 				ServerPlayer player = ctx.get().getSender(); // GET PLAYER
-				Level worldIn = player.level; // GET WORLD
+				Level worldIn = player.level(); // GET WORLD
 				BlockPos pos = packet.pos;
 				BlockEntity tileentity = worldIn.getBlockEntity(pos); // GET THE TILE ENTITY IN WORLD THANKS TO COORDINATES
 				BlockSeller seller = (BlockSeller) worldIn.getBlockState(pos).getBlock();

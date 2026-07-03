@@ -2,14 +2,13 @@
  *******************************************************************************/
 package fr.fifoube.gui;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
 import fr.fifoube.main.ModEconomyInc;
 import fr.fifoube.main.capabilities.CapabilityMoney;
 import fr.fifoube.packets.PacketCardChange;
 import fr.fifoube.packets.PacketsRegistery;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
@@ -110,18 +109,16 @@ public class GuiCreditCard extends Screen {
 	
 	
 	@Override
-	public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTicks) {
+	public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
 		
-		this.renderBackground(poseStack);
+		this.renderBackground(guiGraphics);
 		int i = this.guiLeft;
 		int j = this.guiTop;
-		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        RenderSystem.setShaderTexture(0, background);		
-        this.blit(poseStack, this.guiLeft, this.guiTop, 0, 0, xSize, ySize);
-        InventoryScreen.renderEntityInInventoryFollowsMouse(poseStack,i + 28, j + 58, 25, (float)(i + 51) - mouseX, (float)(j + 75 - 50) - mouseY, this.minecraft.player);
-		super.render(poseStack, mouseX, mouseY, partialTicks);
-		this.font.draw(poseStack, Component.translatable("title.ownerCard", name), (this.width / 2) - 75, (this.height / 2)- 55, Color.DARK_GRAY.getRGB());
-		this.font.draw(poseStack, Component.translatable("title.fundsCard", funds_s), (this.width / 2) - 75, (this.height / 2)- 45, Color.DARK_GRAY.getRGB());
+        guiGraphics.blit(background, this.guiLeft, this.guiTop, 0, 0, xSize, ySize);
+        InventoryScreen.renderEntityInInventoryFollowsMouse(guiGraphics, i + 28, j + 58, 25, (float)(i + 51) - mouseX, (float)(j + 75 - 50) - mouseY, this.minecraft.player);
+		super.render(guiGraphics, mouseX, mouseY, partialTicks);
+		guiGraphics.drawString(this.font, Component.translatable("title.ownerCard", name), (this.width / 2) - 75, (this.height / 2)- 55, Color.DARK_GRAY.getRGB());
+		guiGraphics.drawString(this.font, Component.translatable("title.fundsCard", funds_s), (this.width / 2) - 75, (this.height / 2)- 45, Color.DARK_GRAY.getRGB());
 		 
 	}
 }

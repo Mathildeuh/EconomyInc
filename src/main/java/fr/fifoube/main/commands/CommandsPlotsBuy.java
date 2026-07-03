@@ -58,7 +58,7 @@ public class CommandsPlotsBuy {
     	if(player != null)
     	{	
     		String uuid = player.getStringUUID();
-    		ServerLevel worldIn = player.getLevel();
+    		ServerLevel worldIn = (ServerLevel) player.level();
     		DimensionDataStorage storage = worldIn.getDataStorage();
 			PlotsWorldSavedData dataWorld = (PlotsWorldSavedData)storage.computeIfAbsent(PlotsWorldSavedData::new, PlotsWorldSavedData::new, PlotsWorldSavedData.DATA_NAME);
 			if(dataWorld != null)
@@ -98,7 +98,7 @@ public class CommandsPlotsBuy {
 						data.setMoney(newMoney);
 						replaceSign(worldIn, plotsData.xPosFirst, plotsData.yPos, plotsData.zPosFirst, plotsData.xPosSecond, plotsData.zPosSecond, plotsData.name, plotsData.owner);
 						ModEconomyInc.LOGGER_MONEY.info(s.getDisplayName().getString() + " has bought plot " + plotsData.name + ". Balance was at " + data.getMoney() + ", balance is now " + (data.getMoney() - plotsData.price) + "." + "[UUID: " + s.getUUID() + ",PlotID: " + plotsData.name +"]");
-						src.sendSuccess(Component.translatable("commands.plotbuy.success"), false);
+						src.sendSuccess(() -> Component.translatable("commands.plotbuy.success"), false);
 					}	
 					else
 					{
@@ -139,10 +139,11 @@ public class CommandsPlotsBuy {
 			
 			if(signTe != null)
 			{
-				signTe.setMessage(0 , Component.literal("[" + name + "]").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.BLUE));
-				signTe.setMessage(1 , Component.literal("Owned by").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.BLACK));
-				signTe.setMessage(2 , Component.literal(playerIn.getDisplayName().getString()).withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.BLACK));
-				signTe.setMessage(3 , Component.literal("[SOLD]").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.RED));
+				signTe.updateText(text -> text
+						.setMessage(0, Component.literal("[" + name + "]").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.BLUE))
+						.setMessage(1, Component.literal("Owned by").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.BLACK))
+						.setMessage(2, Component.literal(playerIn.getDisplayName().getString()).withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.BLACK))
+						.setMessage(3, Component.literal("[SOLD]").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.RED)), true);
 				signTe.setChanged();
 			}
 		}

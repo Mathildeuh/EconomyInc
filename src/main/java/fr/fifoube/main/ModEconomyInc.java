@@ -60,10 +60,10 @@ public class ModEconomyInc {
 			ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, ConfigHolder.CLIENT_SPEC);
 			ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, ConfigHolder.SERVER_SPEC);
 
+			EconomyIncModTab.CREATIVE_MODE_TABS.register(bus);
+
 			bus.addListener(this::setup);
 			bus.addListener(this::clientSetup);
-			bus.addListener(EconomyIncModTab::addCreativeModTab);
-			bus.addListener(EconomyIncModTab::addToTab);
 			MinecraftForge.EVENT_BUS.addListener(this::serverStartingEvent);
 	        MinecraftForge.EVENT_BUS.addListener(this::onCommandRegister);
 	        
