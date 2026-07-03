@@ -39,6 +39,13 @@
 
 "title.ownerCard":"Owner : %s",
 "title.fundsCard":"Funds : %s",
+"title.amountInput":"Amount",
+"title.deposit":"Deposit",
+"title.withdraw":"Withdraw",
+"title.invalidAmount":"Invalid amount.",
+"title.insufficientBills":"Not enough bills in inventory.",
+"title.insufficientFunds":"Insufficient account balance.",
+"title.atmAccessDenied":"Access denied: use an ATM or a linked wireless card.",
 "title.deleteC1":"Delete your card ",
 "title.linkedCard":"Upgraded : %s",
 "title.wireless":"Wireless technology",

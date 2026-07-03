@@ -35,6 +35,13 @@
 
 "title.ownerCard":"Propriétaire : %s",
 "title.fundsCard":"Fonds : %s",
+"title.amountInput":"Montant",
+"title.deposit":"Déposer",
+"title.withdraw":"Retirer",
+"title.invalidAmount":"Montant invalide.",
+"title.insufficientBills":"Billets insuffisants dans l'inventaire.",
+"title.insufficientFunds":"Fonds insuffisants sur le compte.",
+"title.atmAccessDenied":"Accès refusé : utilisez un distributeur ou une carte sans fil liée.",
 
 "title.deleteC1":"Supprimer la carte",
 

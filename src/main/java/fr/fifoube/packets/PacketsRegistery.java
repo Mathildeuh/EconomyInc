@@ -10,7 +10,7 @@ import net.minecraftforge.network.simple.SimpleChannel;
 
 public class PacketsRegistery {
 
-	public static final String PROTOCOL_VERSION = String.valueOf(1);
+	public static final String PROTOCOL_VERSION = String.valueOf(2);
 	
 	public static final SimpleChannel CHANNEL = NetworkRegistry.ChannelBuilder.named(new ResourceLocation(ModEconomyInc.MOD_ID, "packets_ei")).networkProtocolVersion(() -> PROTOCOL_VERSION)
 			.clientAcceptedVersions(PROTOCOL_VERSION::equals).serverAcceptedVersions(PROTOCOL_VERSION::equals).simpleChannel();
