@@ -65,6 +65,17 @@ public class BlockBills extends Block implements EntityBlock {
 	    	{
 	    		ItemStack heldStack = player.getItemInHand(hand);
 	    		if (heldStack.isEmpty() && te.getNumbBills() > 0) {
+	    			if (hand == InteractionHand.MAIN_HAND && player.isShiftKeyDown()) {
+	    				ItemStack bill = te.getItemBill(te.getBillValue());
+	    				bill.setCount(te.getNumbBills());
+	    				if (!player.addItem(bill)) {
+	    					player.drop(bill, false);
+	    				}
+	    				te.setNumbUse(0);
+	    				te.setBillValue(0);
+	    				te.setChanged();
+	    				return InteractionResult.SUCCESS;
+	    			}
 	    			player.displayClientMessage(net.minecraft.network.chat.Component.translatable("title.billsStorageValue", te.getTotalValue()), true);
 	    			return InteractionResult.SUCCESS;
 	    		}
